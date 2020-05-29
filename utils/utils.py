@@ -54,48 +54,17 @@ __email__ = "or.dimitrov@polygonteam.com"
 ## File status.
 __status__ = "Debug"
 
-# @see Documentation: https://www.python.org/dev/peps/pep-0008/
-# @see Licensing:     http://choosealicense.com/licenses/
-# @see Description:   http://stackoverflow.com/questions/1523427/what-is-the-common-header-format-of-python-files
-# @see Doxygen:       https://www.stack.nl/~dimitri/doxygen/manual/docblocks.html#pythonblocks
+# System libraries.
+import time, os
 
-import socket, sys, ssl
-from http.server import BaseHTTPRequestHandler, HTTPServer
+## IOUtils class
+#
+#  This class is dedicated to manage the utility functions.
+class IOUtils():
 
-from io_service_handler.io_service_handler import IOServiceHandler
-
-## Server parameters "Default is 8080".
-PORT_NUMBER = 8090
-
-## Main function of the app.
-def main():
-    global PORT_NUMBER
-    
-    # Try to run ...
-    try:
-        # Create a web server and define the handler
-        # to manage the incoming request.
-        server = HTTPServer(('', PORT_NUMBER), IOServiceHandler)
-
-        # HTTPS
-        # https://gist.github.com/dergachev/7028596
-        #server.socket = ssl.wrap_socket(server.socket, certfile='./server.pem', server_side=True)
-
-        # Print network addresses.
-        ip_address = socket.gethostbyname(socket.gethostname())
-        schema = 'Started server @ {0}:{1}'.format(ip_address, PORT_NUMBER)
-        print(schema)
-
-        # Wait forever for incoming http requests.
-        server.serve_forever()
-        
-    except TypeError:
-        print('Type error ...')
-        
-    except KeyboardInterrupt:
-        print('^C received, shutting down the server')
-        server.socket.close()
-        
-## Where all begin ...
-if(__name__ == '__main__'):
-    main()
+    ## Return CPU temperature as a character string
+    #  @return CPU temperature.
+    @staticmethod
+    def get_cpu_temperature():
+        res = os.popen('vcgencmd measure_temp').readline()
+        return(float(res.replace("temp=","").replace("'C\n","")))

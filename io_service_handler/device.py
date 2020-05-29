@@ -27,6 +27,10 @@ SOFTWARE.
 
 '''
 
+'''http://user:pass@ip.address/'''
+
+# http://ipaddress/?RelayOutputs=all&DigitalInputs=all&CounterInputs=all&AnalogInputs=all&ElectronicScales=all
+
 ## Author of the file.
 __author__ = "Orlin Dimitrov"
 
@@ -54,48 +58,30 @@ __email__ = "or.dimitrov@polygonteam.com"
 ## File status.
 __status__ = "Debug"
 
-# @see Documentation: https://www.python.org/dev/peps/pep-0008/
-# @see Licensing:     http://choosealicense.com/licenses/
-# @see Description:   http://stackoverflow.com/questions/1523427/what-is-the-common-header-format-of-python-files
-# @see Doxygen:       https://www.stack.nl/~dimitri/doxygen/manual/docblocks.html#pythonblocks
+class Device():
+    __key = None
+    __name = None
+    __unit = None
+    __id = None
 
-import socket, sys, ssl
-from http.server import BaseHTTPRequestHandler, HTTPServer
+    def __init__(self, name, unit, id):
+        self.__name = name
+        self.__unit = unit
+        self.__id = id
+        self.__values = []
 
-from io_service_handler.io_service_handler import IOServiceHandler
+    def getName(self):
+        return self.__name
 
-## Server parameters "Default is 8080".
-PORT_NUMBER = 8090
+    def getUnit(self):
+        return self.__unit
 
-## Main function of the app.
-def main():
-    global PORT_NUMBER
-    
-    # Try to run ...
-    try:
-        # Create a web server and define the handler
-        # to manage the incoming request.
-        server = HTTPServer(('', PORT_NUMBER), IOServiceHandler)
+    def getID(self):
+        return self.__id
 
-        # HTTPS
-        # https://gist.github.com/dergachev/7028596
-        #server.socket = ssl.wrap_socket(server.socket, certfile='./server.pem', server_side=True)
+    def update_values(self, values):
+        self.__values = values
+        print self.__values
 
-        # Print network addresses.
-        ip_address = socket.gethostbyname(socket.gethostname())
-        schema = 'Started server @ {0}:{1}'.format(ip_address, PORT_NUMBER)
-        print(schema)
-
-        # Wait forever for incoming http requests.
-        server.serve_forever()
-        
-    except TypeError:
-        print('Type error ...')
-        
-    except KeyboardInterrupt:
-        print('^C received, shutting down the server')
-        server.socket.close()
-        
-## Where all begin ...
-if(__name__ == '__main__'):
-    main()
+    def isValid(self):
+        return (self.__key != None and self.__Name and self.__unit != None and self.__id != None)
