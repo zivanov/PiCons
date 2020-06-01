@@ -77,12 +77,15 @@ from utils.settings import AppSettings
 from utils.utils import IOUtils
 from utils.kiosk_settings import KioskSettings
 from cgi import parse_qs
-
+import Adafruit_MCP3008
+import Adafruit_GPIO.SPI as SPI
 ## IOServiceHandler class
 #
 #  This class will handles any incoming request from the clients.
 class IOServiceHandler(BaseHTTPRequestHandler):
-    
+    SPI_PORT   = 0
+    SPI_DEVICE = 0
+    __mcp = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE))    
     ## IO board abstraction driver.
     __board = IOBoard()
     
@@ -628,7 +631,8 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                     id = self.__AI['id'][str(index + 1)]
                     
                     # Get value of the entry item.
-                    value = analog_inputs[index]
+                    #value = analog_inputs[index]
+                    value = self.__mcp.read_adc(index) / 100
                     
                     # Create nama of the entry item.
                     name = self.__AI['name'] + str(index + 1)
@@ -656,7 +660,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                         id = self.__AI['id'][indexes_splitted[index]]
                     
                         # Get value of the entry item.
-                        value = analog_inputs[index]
+                        value = self.__mcp.read_adc(index) / 100
                         
                         # Create nama of the entry item.
                         name = self.__AI['name'] + str(index + 1)
