@@ -1,21 +1,41 @@
+import logging
 class GPIO:
 
-    __logger = False
-    def __init__(self):
-        self.__logger = logging.getLogger('GPIO')
+    FALLING = "FALLING"
+    BCM = 1
+    OUT = "OUT"
+    IN = "IN"
+    PUD_UP = "PUD_UP"
 
 
 
-    def setmode(self, mode):
-        self.__logger.debug("Setting mode %s", mode)
+    @staticmethod
+    def setmode(mode=False):
+        __logger = logging.getLogger('GPIO')
+        __logger.debug("Setting mode %s", mode)
 
-    def setwarnings(self, warnings):
-        self.__logger.debug("Setting warnigns %s", warnings)
+    @staticmethod
+    def setwarnings(warnings):
+        __logger = logging.getLogger('GPIO')
+        __logger.debug("Setting warnigns %s", warnings)
 
-    def setup(self, mode):
-        self.__logger.debug("Setup mode %s", mode)
+    @staticmethod
+    def setup(pin, mode, pull_up_down=False):
+        __logger = logging.getLogger('GPIO')
+        __logger.debug("Setup pin %s - mode %s",pin, mode)
 
-    def output(self, pin, value):
-        self.__logger.debug("Output on pin %s - %s", pin, value)
+    @staticmethod
+    def output(pin, value):
+        __logger = logging.getLogger('GPIO')
+        __logger.debug("Output on pin %s - %s", pin, value)
 
+    @staticmethod
+    def add_event_detect(a,b,x=False,bouncetime=False,callback=False):
+        __logger = logging.getLogger('GPIO')
+        __logger.debug("Event detect")
+        
 
+    @staticmethod
+    def cleanup():
+        __logger = logging.getLogger('GPIO')
+        pass

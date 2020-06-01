@@ -25,12 +25,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # System libraries.
 import time
 import threading
-
+import platform
 ## GPIO boar control.
 # @see http://makezine.com/projects/tutorial-raspberry-pi-gpio-pins-and-python/
-#import RPi.GPIO as GPIO
-import io_board.gpio_mock as GPIO
-
+IS_DEBIAN = platform.linux_distribution()[0].lower() == 'debian'
+if IS_DEBIAN:
+    import RPi.GPIO as GPIO
+else:
+    from  io_board.gpio_mock import GPIO
 ## RPi_mcp3008 is a library to listen to the MCP3008 A/D converter chip with a RPi.
 # @see https://pypi.org/project/mcp3008/
 # @see https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/mcp3008
