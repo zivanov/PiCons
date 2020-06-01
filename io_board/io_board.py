@@ -28,7 +28,8 @@ import threading
 
 ## GPIO boar control.
 # @see http://makezine.com/projects/tutorial-raspberry-pi-gpio-pins-and-python/
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
+import io_board.gpio_mock as GPIO
 
 ## RPi_mcp3008 is a library to listen to the MCP3008 A/D converter chip with a RPi.
 # @see https://pypi.org/project/mcp3008/

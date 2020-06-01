@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 '''
@@ -76,7 +76,7 @@ from electronic_scale.electronic_scale import Measurement
 from utils.settings import AppSettings
 from utils.utils import IOUtils
 from utils.kiosk_settings import KioskSettings
-from cgi import parse_qs
+from urllib.parse import parse_qs
 import Adafruit_MCP3008
 import Adafruit_GPIO.SPI as SPI
 ## IOServiceHandler class
