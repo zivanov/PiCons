@@ -28,8 +28,11 @@ import threading
 import platform
 ## GPIO boar control.
 # @see http://makezine.com/projects/tutorial-raspberry-pi-gpio-pins-and-python/
-IS_DEBIAN = platform.linux_distribution()[0].lower() == 'debian'
-if IS_DEBIAN:
+import os
+uname = os.uname()[1]
+
+IS_RASPBERRY = uname = "raspberrypi"
+if IS_RASPBERRY:
     import RPi.GPIO as GPIO
 else:
     from  io_board.gpio_mock import GPIO
