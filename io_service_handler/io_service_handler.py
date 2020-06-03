@@ -650,11 +650,11 @@ class IOServiceHandler(BaseHTTPRequestHandler):
 
 
                 index = int(indexes)
-                # If the length is grater then one.
-                if(index in self.__AI['id']):
+                # If the key is in AnalogInputs.
+                if(indexes in self.__AI['id']):
 
                     # Get ID of the entry item.
-                    id = self.__AI['id'][index]
+                    id = self.__AI['id'][indexes]
 
                     # Get value of the entry item.
                     value = self.__mcp.read_adc(index) / 100
