@@ -85,31 +85,31 @@ import Adafruit_GPIO.SPI as SPI
 class IOServiceHandler(BaseHTTPRequestHandler):
     SPI_PORT   = 0
     SPI_DEVICE = 0
-    __mcp = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE))    
+    __mcp = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE))
     ## IO board abstraction driver.
     __board = IOBoard()
-    
+
     ## Application settings.
     __settings = AppSettings('/home/pi/PiCons/settings.ini')
-    
+
     ## KIOSK browser settings.
     __kioskSettings = KioskSettings('/home/pi/PiCons/autoChromium.desktop')
-    
+
     ## Page body.
     __the_page = 'OK'
-        
+
     ## MIME type of the response.
     __mime_type = ''
-    
+
     ## Relay 1 command key. Value: 1 or 0
-    __RELAY_1 = 'Relay1' 
+    __RELAY_1 = 'Relay1'
     ## Relay 2 command key. Value: 1 or 0
     __RELAY_2 = 'Relay2'
     ## Relay 3 command key. Value: 1 or 0
     __RELAY_3 = 'Relay3'
     ## Relay 4 command key. Value: 1 or 0
     __RELAY_4 = 'Relay4'
-    
+
     ## Toggle relay 1 command key. Value: 1
     __TOGGLE_RELAY_1 = 'ToggleRelay1'
     ## Toggle relay 2 command key. Value: 1
@@ -118,7 +118,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
     __TOGGLE_RELAY_3 = 'ToggleRelay3'
     ## Toggle relay 4 command key. Value: 1
     __TOGGLE_RELAY_4 = 'ToggleRelay4'
-    
+
     ## Pulse relay 4 command key. Value: 1 to 60[s]
     __PULSE_RELAY_1 = 'PulseRelay1'
     ## Pulse relay 4 command key. Value: 1 to 60[s]
@@ -127,23 +127,23 @@ class IOServiceHandler(BaseHTTPRequestHandler):
     __PULSE_RELAY_3 = 'PulseRelay3'
     ## Pulse relay 4 command key. Value: 1 to 60[s]
     __PULSE_RELAY_4 = 'PulseRelay4'
-    
+
     ## Address of the KIOSK browser in BASE64.
     __KIOSK_ADDRESS = 'KioskAddress'
     ## Preset the default settings of the browser.
     __KIOSK_DEFAULT = 'KioskDefault'
-    
-    ## Relay outputs descriptor. 
+
+    ## Relay outputs descriptor.
     __RO  = {'key' : "RelayOutputs",    'name' : 'RelayOutput',     'unit' : 'LogicLevel', 'id' : {'1': '0', '2': '1', '3': '2', '4': '3'}}
-    ## Digital inputs descriptor.                                   
+    ## Digital inputs descriptor.
     __DI = {'key' : "DigitalInputs",    'name' : 'DigitalInput',    'unit' : 'LogicLevel', 'id' : {'1': '4', '2': '5', '3': '6', '4': '7', '5': '8', '6': '9'}}
-    ## Counters inputs descriptor.                                  
+    ## Counters inputs descriptor.
     __CI = {'key' : "CounterInputs",    'name' : 'CounterInput',    'unit' : 'Count',      'id' : {'1': '10', '2': '11'}}
-    ## Analog inputs descriptor.                                    
+    ## Analog inputs descriptor.
     __AI = {'key' : "AnalogInputs",     'name' : 'AnalogInput',     'unit' : 'V',          'id' : {'1': '12', '2': '13', '3': '14', '4': '15', '5': '16', '6': '17', '7': '18', '8': '19'}}
     ## Electronic scales descriptor.
     __ES = {'key' : "ElectronicScales", 'name' : 'ElectronicScale',                        'id' : {'1': '20'}}
-    
+
     ## Protocol version.
     __PROTOCOL_VERSION = '16.11.0.1'
 
@@ -153,14 +153,14 @@ class IOServiceHandler(BaseHTTPRequestHandler):
     __STATE_HIGH = '1'
 
     ## Get the key.
-    
+
     ## Handler for the GET requests.
     #  @param self The object pointer.
     def do_GET(self):
 
         # Get the key.
         key = self.__settings.get_credentials_as_b64()
-        
+
         #TODO:
         #Fix login
         # Check if it home IP or authorized client respons it.
@@ -183,7 +183,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
 
         # Parse the URL path.
         parsed_url = urlparse(self.path)
-        
+
         # Check is there arguments.
         if(parsed_url.query != None and parsed_url.query != ""):
             # Create the response.
@@ -193,11 +193,11 @@ class IOServiceHandler(BaseHTTPRequestHandler):
             container = dict()
             container['ProtocolVersion'] = self.__PROTOCOL_VERSION
             container['Entrys'] = None
-            
+
             xml = dicttoxml.dicttoxml(container, custom_root='Monitor', attr_type=False)
             # Create the response.
             self.__the_page = xml
-            
+
         # ============================================
 
         self.send_response(200)
@@ -207,10 +207,10 @@ class IOServiceHandler(BaseHTTPRequestHandler):
         self.end_headers()
         # Send the page
         self.wfile.write(self.__the_page)
-        
+
         return
 
-        
+
     ## Handler for the authorization.
     #  @param self The object pointer.
     def do_AUTHHEAD(self):
@@ -220,24 +220,24 @@ class IOServiceHandler(BaseHTTPRequestHandler):
         self.send_header('WWW-Authenticate', 'Basic realm=\"Test\"')
         self.send_header('Content-type', self.__mime_type)
         self.end_headers()
-        
+
     ## Translate relative path to absolute.
     #  @param self The object pointer.
     #  @param url_path relative path from the request.
     def __from_relative_to_absolute(self, url_path):
-        
+
         current_path = os.path.dirname(os.path.realpath(__file__))
         full_path = current_path + url_path
 
         if(os.name == 'nt'):
             full_path = full_path.replace('/', '\\')
-        
+
         if(os.path.isdir(full_path) == True):
             full_path = os.path.join(full_path, self.__default_file_name)
 
         elif(os.path.isfile(full_path) == True):
             full_path = full_path
-            
+
         return full_path
 
     ## Get the content from the file.
@@ -251,9 +251,9 @@ class IOServiceHandler(BaseHTTPRequestHandler):
         content = page_file.read()
         # Close the content.
         page_file.close()
-        
+
         return content
-        
+
     ## Returns MIME type.
     #  @param self The object pointer.
     #  @param url_path URL path.
@@ -290,9 +290,9 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 mime_type = "text/xml"
             else:
                 mime_type = "text/html"
-            
+
         return mime_type
-    
+
     ## Generate entry.
     #  @param self The object pointer.
     #  @param units Units of the measurement in the entry.
@@ -301,29 +301,29 @@ class IOServiceHandler(BaseHTTPRequestHandler):
     #  @param value Value of the measurement.
     def __generate_entry(self, units, id, name, value):
         entry = dict()
-        
+
         entry['Unit'] = units
         entry['ID'] = id
         entry['Name'] = name
         entry['Value'] = value
-        
+
         return entry
-    
+
     ## Create XML response.
     #  @param self The object pointer.
     #  @param url_query URL path.
     def __create_get_response(self, url_query):
-        
+
         query_dict = dict()
-        
+
         # Entry container list.
         entries = []
-        
+
         if(url_query != None):
             #query = urllib.unquote(url_query).decode('utf8')
             ucq_dict = parse_qs(url_query)
             query_dict = dict([(str(key), str(value[0])) for key, value in ucq_dict.items()])
-        
+
         # If relay 1 is in the arguments prase it.
         if(self.__RELAY_1 in query_dict):
             state = query_dict[self.__RELAY_1]
@@ -331,7 +331,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 self.__board.set_output(0, False)
             if(state == "1"):
                 self.__board.set_output(0, True)
-                
+
         # If relay 2 is in the arguments prase it.
         if(self.__RELAY_2 in query_dict):
             state = query_dict[self.__RELAY_2]
@@ -339,7 +339,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 self.__board.set_output(1, False)
             if(state == "1"):
                 self.__board.set_output(1, True)
-                
+
         # If relay 3 is in the arguments prase it.
         if(self.__RELAY_3 in query_dict):
             state = query_dict[self.__RELAY_3]
@@ -347,7 +347,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 self.__board.set_output(2, False)
             if(state == "1"):
                 self.__board.set_output(2, True)
-                
+
         # If relay 4 is in the arguments prase it.
         if(self.__RELAY_4 in query_dict):
             state = query_dict[self.__RELAY_4]
@@ -355,35 +355,35 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 self.__board.set_output(3, False)
             if(state == "1"):
                 self.__board.set_output(3, True)
-                
+
         # If toggle relay 1 is in the arguments prase it.
         if(self.__TOGGLE_RELAY_1 in query_dict):
             state = str(query_dict[self.__TOGGLE_RELAY_1][0])
             if(state == "1"):
                 state = not self.__board.get_output(0)
                 self.__board.set_output(0, state)
-                
+
         # If toggle relay 2 is in the arguments prase it.
         if(self.__TOGGLE_RELAY_2 in query_dict):
             state = query_dict[self.__TOGGLE_RELAY_2]
             if(state == "1"):
                 state = not self.__board.get_output(1)
                 self.__board.set_output(1, state)
-                
+
         # If toggle relay 3 is in the arguments prase it.
         if(self.__TOGGLE_RELAY_3 in query_dict):
             state = query_dict[self.__TOGGLE_RELAY_3]
             if(state == "1"):
                 state = not self.__board.get_output(2)
                 self.__board.set_output(2, state)
-                
+
         # If toggle relay 4 is in the arguments prase it.
         if(self.__TOGGLE_RELAY_4 in query_dict):
             state = query_dict[self.__TOGGLE_RELAY_4]
             if(state == "1"):
                 state = not self.__board.get_output(3)
                 self.__board.set_output(3, state)
-                
+
         # If pulse relay 1 is in the arguments prase it.
         if(self.__PULSE_RELAY_1 in query_dict):
             sTime = query_dict[self.__PULSE_RELAY_1]
@@ -392,7 +392,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 self.__board.timed_output_set(0, fTime)
             except:
                 pass
-                
+
         # If pulse relay 2 is in the arguments prase it.
         if(self.__PULSE_RELAY_2 in query_dict):
             sTime = query_dict[self.__PULSE_RELAY_2]
@@ -401,7 +401,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 self.__board.timed_output_set(1, fTime)
             except:
                 pass
-                
+
         # If pulse relay 3 is in the arguments prase it.
         if(self.__PULSE_RELAY_3 in query_dict):
             sTime = query_dict[self.__PULSE_RELAY_3]
@@ -410,7 +410,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 self.__board.timed_output_set(2, fTime)
             except:
                 pass
-                
+
         # If pulse relay 4 is in the arguments prase it.
         if(self.__PULSE_RELAY_4 in query_dict):
             sTime = query_dict[self.__PULSE_RELAY_4]
@@ -419,7 +419,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 self.__board.timed_output_set(3, fTime)
             except:
                 pass
-                
+
         # If kiosk browser address is in the arguments prase it.
         if(self.__KIOSK_ADDRESS in query_dict):
             b64address = query_dict[self.__KIOSK_ADDRESS]
@@ -430,7 +430,7 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 print(e)
 
                 pass
-                
+
         # If kiosk browser default settings is in the arguments prase it.
         if(self.__KIOSK_DEFAULT in query_dict):
             value = query_dict[self.__KIOSK_DEFAULT]
@@ -440,33 +440,33 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 print(e)
 
                 pass
-                        
+
         # Check if the relay outputs key is in the list.
         if(self.__RO['key'] in query_dict):
-        
+
             indexes = query_dict[self.__RO['key']]
-            
+
             relay_outputs = self.__board.get_outputs()
-            
+
             # If the key is all then get all relay outputs.
             if(indexes == 'all'):
                 for index in range(len(self.__RO['id'])):
-                
+
                     # Get ID of the entry item.
                     id = self.__RO['id'][str(index + 1)]
 
                     # Get value of the entry item.
                     value = self.__STATE_HIGH if relay_outputs[index] else self.__STATE_LOW
-                    
+
                     # Create nama of the entry item.
                     name = self.__RO['name'] + str(index + 1)
-                    
+
                     # Generate entry item.
                     entry = self.__generate_entry(self.__RO['unit'], id, name, value)
-                    
+
                     # Add entry item to entries.
                     entries.append(entry)
-                
+
             # If the key is array.
             elif indexes != '':
 
@@ -479,50 +479,50 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 # If the length is grater then one.
                 for index in range(len(indexes_splitted)):
                     if(indexes_splitted[index] in self.__RO['id']):
-                        
+
                         # Get ID of the entry item.
                         id = self.__RO['id'][indexes_splitted[index]]
 
                         # Get value of the entry item.
                         value = self.__STATE_HIGH if relay_outputs[index] else self.__STATE_LOW
-                        
+
                         # Create name of the entry item.
                         name = self.__RO['name'] + indexes_splitted[index]
-                        
+
                         # Generate entry item.
                         entry = self.__generate_entry(self.__RO['unit'], id, name, value)
-                        
+
                         # Add entry item to entries.
                         entries.append(entry)
 
         # Check if the digital inputs key is in the list.
         if(self.__DI['key'] in query_dict):
-        
+
             # Get content from the arguments.
             indexes = query_dict[self.__DI['key']]
-            
+
             # Read inputs.
             digital_inputs = self.__board.get_inputs()
-            
+
             # If the key is all then get all relay inputs.
             if(indexes == 'all'):
                 for index in range(len(self.__DI['id'])):
-                    
+
                     # Get ID of the entry item.
                     id = self.__DI['id'][str(index + 1)]
-                        
+
                     # Get value of the entry item.
                     value = self.__STATE_HIGH if digital_inputs[index] else self.__STATE_LOW
-                    
+
                     # Create nama of the entry item.
                     name = self.__DI['name'] + str(index + 1)
-                    
+
                     # Generate entry item.
                     entry = self.__generate_entry(self.__DI['unit'], id, name, value)
-                    
+
                     # Add entry item to entries.
                     entries.append(entry)
-                
+
             # If the key is array.
             elif(indexes != ''):
 
@@ -536,28 +536,28 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 # If the length is grater then one.
                 for index in range(len(indexes_splitted)):
                     if(indexes_splitted[index] in self.__DI['id']):
-                    
+
                         # Get ID of the entry item.
                         id = self.__DI['id'][indexes_splitted[index]]
-                    
+
                         # Get value of the entry item.
                         value = self.__STATE_HIGH if digital_inputs[index] else self.__STATE_LOW
-                        
+
                         # Create nama of the entry item.
                         name = self.__DI['name'] + indexes_splitted[index]
-                        
+
                         # Generate entry item.
                         entry = self.__generate_entry(self.__DI['unit'], id, name, value)
-                        
+
                         # Add entry item to entries.
                         entries.append(entry)
-                        
+
         # Check if the counter inputs key is in the list.
         if(self.__CI['key'] in query_dict):
-        
+
             # Get content from the arguments.
             indexes = query_dict[self.__CI['key']]
-            
+
             # Read counters_inputs.
             cnt_get1 = self.__board.get_counter1()
             cnt_get2 = self.__board.get_counter2()
@@ -566,26 +566,26 @@ class IOServiceHandler(BaseHTTPRequestHandler):
             self.__board.reset_counter2()
             (cnt_get1, cnt_get2) = self.__settings.get_counters()
             counters_inputs = (cnt_get1, cnt_get2)
-            
+
             # If the key is all then get all counters_inputs.
             if(indexes == 'all'):
                 for index in range(len(self.__CI['id'])):
-                    
+
                     # Get ID of the entry item.
                     id = self.__CI['id'][str(index + 1)]
-                
+
                     # Get value of the entry item.
                     value = counters_inputs[index]
-                    
+
                     # Create name of the entry item.
                     name = self.__CI['name'] + str(index + 1)
-                    
+
                     # Generate entry item.
                     entry = self.__generate_entry(self.__CI['unit'], id, name, value)
-                    
+
                     # Add entry item to entries.
                     entries.append(entry)
-                
+
             # If the key is array.
             elif(indexes != ''):
 
@@ -598,91 +598,88 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 # If the length is grater then one.
                 for index in range(len(indexes_splitted)):
                     if(indexes_splitted[index] in self.__CI['id']):
-                    
+
                         # Get ID of the entry item.
                         id = self.__CI['id'][indexes_splitted[index]]
-                    
+
                         # Get value of the entry item.
                         value = counters_inputs[index]
-                        
+
                         # Create name of the entry item.
                         name = self.__CI['name'] + indexes_splitted[index]
-                        
+
                         # Generate entry item.
                         entry = self.__generate_entry(self.__CI['unit'], id, name, value)
-                        
+
                         # Add entry item to entries.
                         entries.append(entry)
-                 
+
         # Check if the analog inputs key is in the list.
         if(self.__AI['key'] in query_dict):
-        
+
             # Get content from the arguments.
             indexes = query_dict[self.__AI['key']]
-            
+
             # Read analog analog inputs.
             analog_inputs = self.__board.get_analogs()
-            
+
             # If the key is all then get all relay analog inputs.
             if(indexes == 'all'):
                 for index in range(len(self.__AI['id'])):
-                    
+
                     # Get ID of the entry item.
                     id = self.__AI['id'][str(index + 1)]
-                    
+
                     # Get value of the entry item.
                     #value = analog_inputs[index]
                     value = self.__mcp.read_adc(index) / 100
-                    
+
                     # Create nama of the entry item.
                     name = self.__AI['name'] + str(index + 1)
-                    
+
                     # Generate entry item.
                     entry = self.__generate_entry(self.__AI['unit'], id, name, value)
-                    
+
                     # Add entry item to entries.
                     entries.append(entry)
-                
+
             # If the key is array.
             elif(indexes != ''):
 
                 # Split by coma.
-                indexes_splitted = indexes.split(',')
 
-                # Remove duplicates.
-                indexes_splitted = list(set(indexes_splitted))
 
+                index = int(indexes)
                 # If the length is grater then one.
-                for index in range(len(indexes_splitted)):
-                    if(indexes_splitted[index] in self.__AI['id']):
-                    
-                        # Get ID of the entry item.
-                        id = self.__AI['id'][indexes_splitted[index]]
-                    
-                        # Get value of the entry item.
-                        value = self.__mcp.read_adc(index) / 100
-                        
-                        # Create nama of the entry item.
-                        name = self.__AI['name'] + str(index + 1)
-                        
-                        # Generate entry item.
-                        entry = self.__generate_entry(self.__AI['unit'], id, name, value)
-                        
-                        # Add entry item to entries.
-                        entries.append(entry)
+                if(index in self.__AI['id']):
+
+                    # Get ID of the entry item.
+                    id = self.__AI['id'][index]
+
+                    # Get value of the entry item.
+                    value = self.__mcp.read_adc(index) / 100
+
+                    # Create nama of the entry item.
+                    name = self.__AI['name'] + str(index + 1)
+
+                    # Generate entry item.
+                    entry = self.__generate_entry(self.__AI['unit'], id, name, value)
+
+                    # Add entry item to entries.
+                    entries.append(entry)
 
         # Check if the electronic scale key is in the list.
         if(self.__ES['key'] in query_dict):
-        
+
             # Get content from the arguments.
             indexes = query_dict[self.__ES['key']]
-            
+
             measurements = None
-            
+
             # Read the electronic scale.
             try:
                 measurements = ElectronicScale.static_get_weight('/dev/serial0') # '/dev/serial0'
-                test = 1 
+                test = 1
             # Catch exception.
             except Exception as exception:
                 error_text = str(exception.args[0])
@@ -698,33 +695,33 @@ class IOServiceHandler(BaseHTTPRequestHandler):
             # Data container.
             es_inputs = []
             es_inputs.append(measurements)
-            
+
             # If the key is all then get all electronic scales.
             if(indexes == 'all'):
                 for index in range(len(self.__ES['id'])):
-                                        
+
                     # Get ID of the entry item.
                     id = self.__ES['id'][str(index + 1)]
-                        
+
                     # Create nama of the entry item.
                     name = self.__ES['name'] + str(index + 1)
-                    
+
                     # Temporal fields.
                     value = ''
                     unit = ''
-                    
+
                     # Get value of the entry item.
                     if(es_inputs[index] != None):
                         if(es_inputs[index].isValid()):
                             value = es_inputs[index].getValue()
                             unit = es_inputs[index].getUnit()
-                    
+
                     # Generate entry item.
                     es_entry = self.__generate_entry(unit, id, name, value)
-                    
+
                     # Add entry item to entries.
                     entries.append(es_entry)
-                
+
             # If the key is array.
             elif(indexes != ''):
 
@@ -737,25 +734,25 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 # If the length is grater then one.
                 for index in range(len(indexes_splitted)):
                     if(indexes_splitted[index] in self.__ES['id']):
-                    
+
                         # Get ID of the entry item.
                         id = self.__ES['id'][indexes_splitted[index]]
-                        
+
                         # Create nama of the entry item.
                         name = self.__ES['name'] + indexes_splitted[index]
-                        
+
                         # Temporal fields.
                         value = ''
                         unit = ''
-                        
+
                         # Get value of the entry item.
                         if(es_inputs[index] != None and es_inputs[index].is_valid):
                             value = es_inputs[index].value
                             unit = es_inputs[index].unit
-                                                    
+
                         # Generate entry item.
                         es_entry = self.__generate_entry(unit, id, name, value)
-                        
+
                         # Add entry item to entries.
                         entries.append(es_entry)
 
@@ -763,15 +760,15 @@ class IOServiceHandler(BaseHTTPRequestHandler):
         device = dict()
         device['Entries'] = entries
         device['Name'] = key = self.__settings.get_device_name()
-        
+
         devices = []
         devices.append(device)
-        
+
         container = dict()
         container['Devices'] = devices
         container['ProtocolVersion'] = self.__PROTOCOL_VERSION
-                
+
         xml = dicttoxml.dicttoxml(container, custom_root='Monitor', attr_type=False)
-        
+
         return xml
-        
+
