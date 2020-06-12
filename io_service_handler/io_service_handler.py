@@ -476,24 +476,23 @@ class IOServiceHandler(BaseHTTPRequestHandler):
                 # Remove duplicates and sort.
                 indexes_splitted = sorted(list(set(indexes_splitted)))
 
+                index = int(indexes)
                 # If the length is grater then one.
-                for index in range(len(indexes_splitted)):
-                    if(indexes_splitted[index] in self.__RO['id']):
+                if(indexes in self.__RO['id']):
 
-                        # Get ID of the entry item.
-                        id = self.__RO['id'][indexes_splitted[index]]
+                    # Get ID of the entry item.
+                    id = self.__RO['id'][indexes]
+                    # Get value of the entry item.
+                    value = self.__STATE_HIGH if relay_outputs[index-1 ] else self.__STATE_LOW
 
-                        # Get value of the entry item.
-                        value = self.__STATE_HIGH if relay_outputs[index] else self.__STATE_LOW
+                    # Create name of the entry item.
+                    name = self.__RO['name'] + indexes
 
-                        # Create name of the entry item.
-                        name = self.__RO['name'] + indexes_splitted[index]
+                    # Generate entry item.
+                    entry = self.__generate_entry(self.__RO['unit'], id, name, value)
 
-                        # Generate entry item.
-                        entry = self.__generate_entry(self.__RO['unit'], id, name, value)
-
-                        # Add entry item to entries.
-                        entries.append(entry)
+                    # Add entry item to entries.
+                    entries.append(entry)
 
         # Check if the digital inputs key is in the list.
         if(self.__DI['key'] in query_dict):
